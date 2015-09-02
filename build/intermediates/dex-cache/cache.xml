@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="C:\Users\jonat\Desktop\KookHut\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\23.0.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="4fcf0b1879f8caf497c073e1432d398e9e2988c1">
+        <dex dex="C:\Users\jonat\Desktop\KookHut\app\build\intermediates\pre-dexed\debug\classes-5ec88fd3aa93a9779d4d0dee0978dfabb3c7fdee.jar" />
+    </item>
+    <item
+        jar="C:\Users\jonat\Desktop\KookHut\app\libs\ksoap2-j2se-full-2.1.2.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="0f550320c35a2f2cdcd7a0d56eea37a86779131b">
+        <dex dex="C:\Users\jonat\Desktop\KookHut\app\build\intermediates\pre-dexed\debug\ksoap2-j2se-full-2.1.2-2d3ee4567928f7acf89816d9ba34a84f6ff66c13.jar" />
+    </item>
+    <item
+        jar="C:\Users\jonat\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\23.0.0\support-annotations-23.0.0.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="990e7f98a7bad86a40b1f0bcfeb039023afd0839">
+        <dex dex="C:\Users\jonat\Desktop\KookHut\app\build\intermediates\pre-dexed\debug\support-annotations-23.0.0-0c98c3d54b47ed69df33b499df6b937bbfab7f88.jar" />
+    </item>
+    <item
+        jar="C:\Users\jonat\Desktop\KookHut\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.0.0\jars\libs\internal_impl-23.0.0.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="8bd336eeae661e8311330284897ee07f8ebaa297">
+        <dex dex="C:\Users\jonat\Desktop\KookHut\app\build\intermediates\pre-dexed\debug\internal_impl-23.0.0-d2f79d1099490677a386b465af23d83f9c7045cb.jar" />
+    </item>
+    <item
+        jar="C:\Users\jonat\Desktop\KookHut\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.0.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="8413c27b45b7fe61dca4a98159f65e2cee215f5a">
+        <dex dex="C:\Users\jonat\Desktop\KookHut\app\build\intermediates\pre-dexed\debug\classes-92b06fd071d70b2e24788918bfa9c9e11ff5eb22.jar" />
+    </item>
+
+</items>
