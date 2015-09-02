@@ -16,6 +16,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.example.jonathan.kookhut.db.CategoryLoader;
+
 
 public class HomeActivity extends AppCompatActivity implements CategoryFragment.OnFragmentInteractionListener, FavoriteFragment.OnFragmentInteractionListener, OptionsFragment.OnFragmentInteractionListener {
     /* Fields */

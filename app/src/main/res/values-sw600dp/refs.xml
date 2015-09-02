@@ -16,7 +16,7 @@
     For more on layout aliases, see:
     http://developer.android.com/training/multiscreen/screensizes.html#TaskUseAliasFilters
     -->
-    <item name="fragment_recipy" type="layout">@layout/fragment_recipyoverview_grid</item>
+    <item name="fragment_recipy" type="layout">@layout/fragment_recipeoverview_grid</item>
 
     <!--
     Layout alias to replace the single-pane version of the layout with a

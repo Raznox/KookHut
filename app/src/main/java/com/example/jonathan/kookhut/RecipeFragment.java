@@ -12,12 +12,12 @@ import android.view.ViewGroup;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link RecipyFragment.OnFragmentInteractionListener} interface
+ * {@link RecipeFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link RecipyFragment#newInstance} factory method to
+ * Use the {@link RecipeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RecipyFragment extends Fragment {
+public class RecipeFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -35,11 +35,11 @@ public class RecipyFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment RecipyFragment.
+     * @return A new instance of fragment RecipeFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static RecipyFragment newInstance(String param1, String param2) {
-        RecipyFragment fragment = new RecipyFragment();
+    public static RecipeFragment newInstance(String param1, String param2) {
+        RecipeFragment fragment = new RecipeFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -47,7 +47,7 @@ public class RecipyFragment extends Fragment {
         return fragment;
     }
 
-    public RecipyFragment() {
+    public RecipeFragment() {
         // Required empty public constructor
     }
 
@@ -64,7 +64,7 @@ public class RecipyFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_recipy, container, false);
+        return inflater.inflate(R.layout.fragment_recipe, container, false);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
