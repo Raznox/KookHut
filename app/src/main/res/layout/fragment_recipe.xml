@@ -4,7 +4,33 @@
     tools:context="com.example.jonathan.kookhut.RecipeFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
 
+    <ImageView
+        android:layout_width="290dp"
+        android:layout_height="145dp"
+        android:id="@+id/imageViewRecipe"
+        android:layout_gravity="left|top"
+        android:padding="10dp"/>
+    <TextView
+        android:layout_width="290dp"
+        android:layout_height="145dp"
+        android:id="@+id/textViewIngredients"
+        android:scrollbars="vertical"
+        android:layout_gravity="left|bottom"
+        android:padding="10dp" />
+    <TextView
+        android:layout_width="290dp"
+        android:layout_height="50dp"
+        android:id="@+id/textViewPeopleTime"
+        android:layout_gravity="right|top"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp"/>
+    <TextView
+        android:layout_width="290dp"
+        android:layout_height="240dp"
+        android:id="@+id/textViewPreparation"
+        android:scrollbars="vertical"
+        android:layout_gravity="right|bottom"
+        android:padding="10dp"/>
 </FrameLayout>

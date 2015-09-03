@@ -8,17 +8,29 @@ import java.util.List;
 public class Recipe {
     public Integer id;
     public String name;
-    public String imageUrl;
-    public String preperation;
+    public String imgUrl;
+    public String preparation;
+    public Integer people;
+    public String time;
     public List<String> ingrediënts;
 
     public Recipe(){}
 
-    public Recipe(Integer id, String name, String imgUrl, String preperation, List<String> ingredients){
+    public Recipe(Integer id, String name, String imgUrl, String preparation, Integer people, String time, List<String> ingredients){
         this.id = id;
         this.name = name;
-        this.imageUrl = imgUrl;
-        this.preperation = preperation;
+        this.imgUrl = imgUrl;
+        this.preparation = preparation;
+        this.people = people;
+        this.time = time;
         this.ingrediënts = ingredients;
+    }
+
+    public String GetIngredients(){
+        String formattedIngredients = "Ingredienten:\n";
+        for (String ingredient:this.ingrediënts) {
+            formattedIngredients += ingredient + "\n";
+        }
+        return formattedIngredients;
     }
 }

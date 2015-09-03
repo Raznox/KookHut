@@ -19,7 +19,7 @@ import android.widget.ListView;
 import com.example.jonathan.kookhut.db.CategoryLoader;
 
 
-public class HomeActivity extends AppCompatActivity implements CategoryFragment.OnFragmentInteractionListener, FavoriteFragment.OnFragmentInteractionListener, OptionsFragment.OnFragmentInteractionListener {
+public class HomeActivity extends AppCompatActivity implements CategoryFragment.OnFragmentInteractionListener, FavoriteFragment.OnFragmentInteractionListener, OptionsFragment.OnFragmentInteractionListener, RecipeListFragment.OnFragmentInteractionListener {
     /* Fields */
     private ListView mDrawerList;
     private ArrayAdapter<String> mAdapter;
@@ -93,21 +93,25 @@ public class HomeActivity extends AppCompatActivity implements CategoryFragment.
     }
 
     private  void selectItem(int position) {
-        Fragment goTo = new Fragment();
+        Fragment fragment = null;
                 switch (position) {
                     case 0:
-                        goTo = new CategoryFragment();
+                        fragment = getFragmentManager().findFragmentById(R.id.content_frame);
+                        if (!(fragment instanceof CategoryFragment)){
+                            fragment = new CategoryFragment();
+                        }
                         break;
                     case 1:
-                        goTo = new FavoriteFragment();
+                        fragment = new FavoriteFragment();
                         break;
                     case 2:
-                        goTo = new OptionsFragment();
+                        fragment = new OptionsFragment();
                         break;
                 }
-        getFragmentManager().beginTransaction()
-                .replace(R.id.content_frame, goTo)
-                .commit();
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.content_frame, fragment)
+                    .commit();
+
         mDrawerList.setItemChecked(position, true);
         mDrawerLayout.closeDrawer(mDrawerList);
     }

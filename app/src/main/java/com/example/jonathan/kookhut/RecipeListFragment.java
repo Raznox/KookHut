@@ -1,6 +1,13 @@
 package com.example.jonathan.kookhut;
 
 import android.app.Activity;
+import android.app.LoaderManager;
+import android.content.Context;
+import android.content.Loader;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
@@ -8,11 +15,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.CursorAdapter;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+import com.example.jonathan.kookhut.db.ImageLoader;
+import com.example.jonathan.kookhut.db.RecipeListLoader;
 import com.example.jonathan.kookhut.dummy.DummyContent;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.concurrent.ExecutionException;
 
 /**
  * A fragment representing a list of Items.
@@ -23,16 +40,11 @@ import com.example.jonathan.kookhut.dummy.DummyContent;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class RecipeListFragment extends Fragment implements AbsListView.OnItemClickListener {
+public class RecipeListFragment extends Fragment implements AbsListView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor>  {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_CATEGORYID = "categoryID";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private Integer CategoryID;
 
     private OnFragmentInteractionListener mListener;
 
@@ -45,14 +57,12 @@ public class RecipeListFragment extends Fragment implements AbsListView.OnItemCl
      * The Adapter which will be used to populate the ListView/GridView with
      * Views.
      */
-    private ListAdapter mAdapter;
+    private CursorAdapter mAdapter;
 
-    // TODO: Rename and change types of parameters
-    public static RecipeListFragment newInstance(String param1, String param2) {
+    public static RecipeListFragment newInstance(int CategoryID) {
         RecipeListFragment fragment = new RecipeListFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putInt(ARG_CATEGORYID, CategoryID);
         fragment.setArguments(args);
         return fragment;
     }
@@ -69,19 +79,19 @@ public class RecipeListFragment extends Fragment implements AbsListView.OnItemCl
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            CategoryID = getArguments().getInt(ARG_CATEGORYID);
         }
 
-        // TODO: Change Adapter to display your content
-        mAdapter = new ArrayAdapter<DummyContent.DummyItem>(getActivity(),
-                android.R.layout.simple_list_item_1, android.R.id.text1, DummyContent.ITEMS);
+        String[] columns = new String[] { Contract.RecipeColumns._ID, Contract.RecipeColumns.name, Contract.RecipeColumns.imgUrl};
+        int[] viewIds = new int[] { R.id.textViewRecipeList, R.id.imageViewRecipeList};
+
+        mAdapter = new RecipeAdapter(getActivity(), R.layout.row_recipe, null, columns, viewIds, 0);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_recipe, container, false);
+        View view = inflater.inflate(R.layout.fragment_recipeoverview_list, container, false);
 
         // Set the adapter
         mListView = (AbsListView) view.findViewById(android.R.id.list);
@@ -94,14 +104,9 @@ public class RecipeListFragment extends Fragment implements AbsListView.OnItemCl
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(0, null, this);
     }
 
     @Override
@@ -112,11 +117,10 @@ public class RecipeListFragment extends Fragment implements AbsListView.OnItemCl
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (null != mListener) {
-            // Notify the active callbacks interface (the activity, if the
-            // fragment is attached to one) that an item has been selected.
-            mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
-        }
+        Cursor c = (Cursor)mAdapter.getItem(position);
+        getFragmentManager().beginTransaction()
+                .replace(R.id.content_frame, RecipeFragment.newInstance(c.getInt(c.getColumnIndex(Contract.RecipeColumns._ID)), c.getString(c.getColumnIndex(Contract.RecipeColumns.imgUrl))))
+                .commit();
     }
 
     /**
@@ -130,6 +134,21 @@ public class RecipeListFragment extends Fragment implements AbsListView.OnItemCl
         if (emptyView instanceof TextView) {
             ((TextView) emptyView).setText(emptyText);
         }
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new RecipeListLoader(getActivity(), CategoryID);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        mAdapter.swapCursor(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 
     /**
@@ -147,4 +166,40 @@ public class RecipeListFragment extends Fragment implements AbsListView.OnItemCl
         public void onFragmentInteraction(String id);
     }
 
+    class RecipeAdapter extends SimpleCursorAdapter {
+
+        class ViewHolder {
+
+            public ImageView image;
+            public TextView RecipeName;
+
+            public ViewHolder(View v) {
+                image = (ImageView) v.findViewById(R.id.imageViewRecipeList);
+                RecipeName = (TextView) v.findViewById(R.id.textViewRecipeList);
+            }
+        }
+
+        private Context context;
+        private int layout;
+
+        public RecipeAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
+            super(context, layout, c, from, to, flags);
+            this.context = context;
+            this.layout = layout;
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            View view = super.newView(context, cursor, parent);
+            view.setTag(new ViewHolder(view));
+            return view;
+        }
+
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            final ViewHolder viewholder = (ViewHolder) view.getTag();
+            viewholder.RecipeName.setText(cursor.getString(cursor.getColumnIndex(Contract.RecipeColumns.name)));
+            new ImageLoader(viewholder.image).execute(cursor.getString(cursor.getColumnIndex(Contract.RecipeColumns.imgUrl)));
+        }
+    }
 }

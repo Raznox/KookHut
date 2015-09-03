@@ -4,16 +4,16 @@
     android:layout_height="60dp">
 
     <ImageView
-        android:id="@+id/imageViewCategory"
+        android:id="@+id/imageViewRecipeList"
         android:layout_width="60dp"
-        android:layout_marginLeft="5dp"
+        android:layout_marginLeft="10dp"
         android:layout_height="match_parent" />
 
     <TextView
-        android:id="@+id/textViewCategory"
+        android:id="@+id/textViewRecipeList"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/imageViewCategory"
+        android:layout_toRightOf="@+id/imageViewRecipeList"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="24dp"/>
 

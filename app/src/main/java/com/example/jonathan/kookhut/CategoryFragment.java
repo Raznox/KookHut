@@ -4,12 +4,8 @@ import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Loader;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -18,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
@@ -26,14 +21,8 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import com.example.jonathan.kookhut.db.CategoryLoader;
-import com.example.jonathan.kookhut.dummy.DummyContent;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
+import com.example.jonathan.kookhut.db.ImageLoader;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -100,17 +89,6 @@ public class CategoryFragment extends Fragment implements AbsListView.OnItemClic
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         getLoaderManager().initLoader(0, null, this);
@@ -140,11 +118,10 @@ public class CategoryFragment extends Fragment implements AbsListView.OnItemClic
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (null != mListener) {
-            // Notify the active callbacks interface (the activity, if the
-            // fragment is attached to one) that an item has been selected.
-            mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
-        }
+        Cursor c = (Cursor)mAdapter.getItem(position);
+        getFragmentManager().beginTransaction()
+                .replace(R.id.content_frame, RecipeListFragment.newInstance(c.getInt(c.getColumnIndex(Contract.CategoryColumns._ID))))
+                .commit();
     }
 
     /**
@@ -210,49 +187,9 @@ public class CategoryFragment extends Fragment implements AbsListView.OnItemClic
             final ViewHolder viewholder = (ViewHolder) view.getTag();
             viewholder.CategoryName.setText(cursor.getString(cursor.getColumnIndex(Contract.CategoryColumns.name)));
 
-                AsyncTask<String, Void, Bitmap> task = new imgloader().execute(cursor.getString(cursor.getColumnIndex((Contract.CategoryColumns.imgUrl))));
-                Bitmap bitmap = null;
-
-                try {
-                    bitmap = task.get();
-                    viewholder.image.setImageBitmap(bitmap);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
-
+            new ImageLoader(viewholder.image).execute(cursor.getString(cursor.getColumnIndex(Contract.CategoryColumns.imgUrl)));
         }
 
-        class imgloader extends AsyncTask<String, Void, Bitmap>
-        {
-            @Override
-            protected Bitmap doInBackground(String... strings) {
-                Bitmap bitmap=null;
-
-                try {
-                    URL newurl = new URL(strings[0]);
-                    HttpURLConnection connection = (HttpURLConnection) newurl.openConnection();
-                    connection.setDoInput(true);
-                    connection.connect();
-                    InputStream input = connection.getInputStream();
-
-                    bitmap  = (Bitmap) BitmapFactory.decodeStream(input);
-
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-
-                return bitmap;
-            }
-
-            @Override
-            protected void onPostExecute(Bitmap bitmap) {
-                super.onPostExecute(bitmap);
-            }
-        }
     }
 
 }

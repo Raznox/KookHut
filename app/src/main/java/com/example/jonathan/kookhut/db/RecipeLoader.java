@@ -1,11 +1,18 @@
 package com.example.jonathan.kookhut.db;
 
+import android.app.Activity;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.MatrixCursor;
+import android.media.Image;
+import android.os.AsyncTask;
+import android.text.method.ScrollingMovementMethod;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.jonathan.kookhut.Contract;
+import com.example.jonathan.kookhut.R;
 import com.example.jonathan.kookhut.db.Models.Category;
 import com.example.jonathan.kookhut.db.Models.Recipe;
 import com.google.gson.Gson;
@@ -14,6 +21,7 @@ import com.google.gson.reflect.TypeToken;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.net.URLConnection;
@@ -22,13 +30,14 @@ import java.util.Collection;
 /**
  * Created by jonat on 2/09/2015.
  */
-public class RecipeLoader extends AsyncTaskLoader<Cursor> {
-    private final String url = "http://kookhutrestservice.azurewebsites.net/Recipe/GetList/";
+public class RecipeLoader extends AsyncTask<String, Void, Recipe> {
+    private final String url = "http://kookhutrestservice.azurewebsites.net/Recipe/GetById/";
+    private final WeakReference<Activity> activityWeakReference;
+    private Integer RecipeID;
 
-    private MatrixCursor mCursor;
-
-    public RecipeLoader(Context context) {
-        super(context);
+    public RecipeLoader(Activity activity, Integer RecipeID) {
+        this.activityWeakReference = new WeakReference<Activity>(activity);
+        this.RecipeID = RecipeID;
     }
 
     public static String getJsonFromServer(String url) throws IOException {
@@ -49,81 +58,31 @@ public class RecipeLoader extends AsyncTaskLoader<Cursor> {
     }
 
     @Override
-    public Cursor loadInBackground() {
-        MatrixCursor mCursor = new MatrixCursor(new String[]{Contract.CategoryColumns._ID,Contract.CategoryColumns.name,Contract.CategoryColumns.imgUrl});
+    protected Recipe doInBackground(String... params) {
+        Recipe recipe = null;
         try {
-            Type recipesType = new TypeToken<Collection<Recipe>>() {
-            }.getType();
-
-            Collection<Recipe> recipes = new Gson().fromJson(getJsonFromServer(url), recipesType);
-
-            for (Recipe recipe : recipes){
-                MatrixCursor.RowBuilder row = mCursor.newRow();
-                row.add(recipe.id);
-                row.add(recipe.name);
-                row.add(recipe.ingrediënts);
-                row.add(recipe.imageUrl);
-                row.add(recipe.preperation);
-            }
+            recipe = new Gson().fromJson(getJsonFromServer(url + RecipeID), Recipe.class);
+            Activity activity = activityWeakReference.get();
         } catch (IOException e) {
         }
-        return (Cursor)mCursor;
+        return recipe;
     }
 
     @Override
-    public void deliverResult(Cursor cursor) {
-        if (isReset()) {
-            if (cursor != null) {
-                cursor.close();
-            }
-            return;
+    protected void onPostExecute(Recipe recipe){
+        if (isCancelled()){
+            recipe = null;
         }
 
-        Cursor oldCursor = mCursor;
-        mCursor = (MatrixCursor)cursor;
+        if(activityWeakReference != null){
+            Activity activity = activityWeakReference.get();
 
-        if (isStarted()) {
-            super.deliverResult(cursor);
+            ((TextView)activity.findViewById(R.id.textViewPreparation)).setText(recipe.preparation);
+            ((TextView)activity.findViewById(R.id.textViewPreparation)).setMovementMethod(new ScrollingMovementMethod());
+            ((TextView)activity.findViewById(R.id.textViewPeopleTime)).setText("Voor " + recipe.people + " personen.\n" + recipe.time +" bereidingstijd.");
+            ((TextView)activity.findViewById(R.id.textViewIngredients)).setText(recipe.GetIngredients());
+            ((TextView)activity.findViewById(R.id.textViewIngredients)).setMovementMethod(new ScrollingMovementMethod());
         }
 
-        if (oldCursor != null && oldCursor != cursor && !oldCursor.isClosed()) {
-            oldCursor.close();
-        }
-    }
-
-    @Override
-    protected void onStartLoading() {
-        if(mCursor != null) {
-            deliverResult(mCursor);
-        }
-
-        if(takeContentChanged() || mCursor == null) {
-            forceLoad();
-        }
-    }
-
-    @Override
-    protected void onStopLoading() {
-        cancelLoad();
-    }
-
-    @Override
-    public void onCanceled(Cursor cursor) {
-        if (cursor != null && !cursor.isClosed()) {
-            cursor.close();
-        }
-    }
-
-    @Override
-    protected void onReset() {
-        super.onReset();
-
-        onStopLoading();
-
-        if (mCursor != null && !mCursor.isClosed()) {
-            mCursor.close();
-        }
-
-        mCursor = null;
     }
 }
